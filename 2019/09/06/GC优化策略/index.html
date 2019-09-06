@@ -6,18 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019/9 | Jax&#39;s blogs</title>
+  <title>GC 优化策略 | Jax&#39;s blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="就职极光，对技术有热诚，忠于梳理">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Jax&#39;s blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2019/09/index.html">
+  <meta name="description" content="为什么要优化 ? 在讲为什么要优化之前先讲一下两个重要的优化目标，因为大部分的优化都是围绕着吞吐量及最大暂停时间进行的。如下，描述：  吞吐量吞吐量表示 垃圾回收线程执行花费的时间与实际程序线程执行任务的时间之比。比如，在老板眼中的吞吐量就是，你一个小时中有多少个小时是为他工作的!（而不是带薪刷知乎）。在大部分的服务器系统以及部分批处理的任务程序中，吞吐量当然是一个更加重要的指标。  最大暂停时间">
+<meta name="keywords" content="JVM,性能,GC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GC 优化策略">
+<meta property="og:url" content="http://yoursite.com/2019/09/06/GC优化策略/index.html">
 <meta property="og:site_name" content="Jax&#39;s blogs">
-<meta property="og:description" content="就职极光，对技术有热诚，忠于梳理">
+<meta property="og:description" content="为什么要优化 ? 在讲为什么要优化之前先讲一下两个重要的优化目标，因为大部分的优化都是围绕着吞吐量及最大暂停时间进行的。如下，描述：  吞吐量吞吐量表示 垃圾回收线程执行花费的时间与实际程序线程执行任务的时间之比。比如，在老板眼中的吞吐量就是，你一个小时中有多少个小时是为他工作的!（而不是带薪刷知乎）。在大部分的服务器系统以及部分批处理的任务程序中，吞吐量当然是一个更加重要的指标。  最大暂停时间">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-06T01:36:56.699Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Jax&#39;s blogs">
-<meta name="twitter:description" content="就职极光，对技术有热诚，忠于梳理">
+<meta name="twitter:title" content="GC 优化策略">
+<meta name="twitter:description" content="为什么要优化 ? 在讲为什么要优化之前先讲一下两个重要的优化目标，因为大部分的优化都是围绕着吞吐量及最大暂停时间进行的。如下，描述：  吞吐量吞吐量表示 垃圾回收线程执行花费的时间与实际程序线程执行任务的时间之比。比如，在老板眼中的吞吐量就是，你一个小时中有多少个小时是为他工作的!（而不是带薪刷知乎）。在大部分的服务器系统以及部分批处理的任务程序中，吞吐量当然是一个更加重要的指标。  最大暂停时间">
   
     <link rel="alternative" href="/atom.xml" title="Jax&#39;s blogs" type="application/atom+xml">
   
@@ -161,151 +163,72 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-GC优化策略" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/06/Java并发知识脑图/" class="archive-article-date">
-  	<time datetime="2019-09-06T01:44:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/06/Java并发知识脑图/">Java并发知识脑图</a>
+    <h1 class="article-title" itemprop="name">
+      GC 优化策略
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/06/乐观锁的实现：CAS/" class="archive-article-date">
-  	<time datetime="2019-09-06T01:40:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/06/乐观锁的实现：CAS/">乐观锁的实现：CAS</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">JAVA</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">并发</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/06/自定义MP代码生成器/" class="archive-article-date">
-  	<time datetime="2019-09-06T01:28:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/06/自定义MP代码生成器/">自定义MP代码生成器</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">代码生成器</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">MybatisPlus</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/06/GC优化策略/" class="archive-article-date">
+        
+        <a href="/2019/09/06/GC优化策略/" class="archive-article-date">
   	<time datetime="2019-09-06T00:50:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/06/GC优化策略/">GC 优化策略</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="为什么要优化"><a href="#为什么要优化" class="headerlink" title="为什么要优化 ?"></a>为什么要优化 ?</h4><p> 在讲为什么要优化之前先讲一下两个重要的优化目标，因为大部分的优化都是围绕着吞吐量及最大暂停时间进行的。如下，描述：</p>
+<ul>
+<li><p>吞吐量<br>吞吐量表示 垃圾回收线程执行花费的时间与实际程序线程执行任务的时间之比。比如，在老板眼中的吞吐量就是，你一个小时中有多少个小时是为他工作的!（而不是带薪刷知乎）。<br>在大部分的服务器系统以及部分批处理的任务程序中，吞吐量当然是一个更加重要的指标。</p>
+</li>
+<li><p>最大暂停时间<br>由于程序JVM每隔一段时间都要进行一次GC，因为要让出资源所以会让程序的工作线程都挂起。所以最大暂停时间就是最长的GC 所花费的时间。在一般的金融或者c端产品中，为了更好的用户体</p>
+</li>
+</ul>
+<a id="more"></a>
+<p>————————————————</p>
+<h3 id="GC优化策略"><a href="#GC优化策略" class="headerlink" title="GC优化策略"></a>GC优化策略</h3><h4 id="为什么要优化-1"><a href="#为什么要优化-1" class="headerlink" title="为什么要优化 ?"></a>为什么要优化 ?</h4><p> 在讲为什么要优化之前先讲一下两个重要的优化目标，因为大部分的优化都是围绕着吞吐量及最大暂停时间进行的。如下，描述：</p>
+<ul>
+<li><p>吞吐量<br>吞吐量表示 垃圾回收线程执行花费的时间与实际程序线程执行任务的时间之比。比如，在老板眼中的吞吐量就是，你一个小时中有多少个小时是为他工作的!（而不是带薪刷知乎）。<br>在大部分的服务器系统以及部分批处理的任务程序中，吞吐量当然是一个更加重要的指标。</p>
+</li>
+<li><p>最大暂停时间<br>由于程序JVM每隔一段时间都要进行一次GC，因为要让出资源所以会让程序的工作线程都挂起。所以最大暂停时间就是最长的GC 所花费的时间。在一般的金融或者c端产品中，为了更好的用户体验，对最大暂停时间的要求会比吞吐的更高。</p>
+</li>
+</ul>
+<p>所以现在当有人问起：你会GC优化吗? 你就可以回答：你要优化吞吐呢，还是最大延时呢！？</p>
+<h4 id="如何优化"><a href="#如何优化" class="headerlink" title="如何优化"></a>如何优化</h4><h5 id="优化最大吞吐量"><a href="#优化最大吞吐量" class="headerlink" title="优化最大吞吐量"></a>优化最大吞吐量</h5><p>吞吐量的优化目的在于减少GC的次数与总GC时间，通过减少GC的次数会让CPU减少因为GC带来的线程切换提高了执行效率。<br>步骤：</p>
+<ol>
+<li>通过jstat 观察大部分的GC是发生在什么区之下。</li>
+<li>通过加大对应GC频繁的generation的大小来减少GC次数。<br>可以通过加大整个堆的大小。或者是通过-XX:NewRatio，</li>
+</ol>
+<p>-XX:NewSize等命令来修改年轻代，老年代的分配情况。</p>
+<ol start="3">
+<li>通过选择 UserParallelOldGC 来使用更高效率的高吞吐收集器 parallel compacting collector</li>
+</ol>
+<h5 id="优化最大暂停时间"><a href="#优化最大暂停时间" class="headerlink" title="优化最大暂停时间"></a>优化最大暂停时间</h5><p>步骤：</p>
+<ol>
+<li>由于较大的暂停时间一般都是触发FullGC的时候才会出现，所以通过减小各generation的大小来增加GC次数，从而降低时间。</li>
+<li>通过选择 CMS 或者G1 这些Concurrent 收集器来减低GC的时间。</li>
+</ol>
+<h5 id="不需要脑子的优化"><a href="#不需要脑子的优化" class="headerlink" title="不需要脑子的优化"></a>不需要脑子的优化</h5><p>通过设置-XX:+UseParallelGC选择使用parallel收集器，并且设置<br> -XX:GCTimeRatio=n(gc时间之比)以及-XX:MaxGCPauseMillis=n(最大暂停时间) 然后即可拿起薯片等待收集器自行调整堆大小来达到设置的目标，但是如果两个参数都设置，会以吞吐量为首要目标。</p>
+<p><em>-XX：GCTimeRatio =nnn ,这里的rito的计算公式是：1/（1+nnn）。 比如当 -XX:GCTimeRatio=19 那么目标就是 5% 的垃圾回收时间</em></p>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>以下展示两个仅仅通过修改堆大小及分配后的gc状态，实现通过调优之后减少了GC次数时间，提高吞吐。</p>
+<h5 id="before-："><a href="#before-：" class="headerlink" title="before ："></a>before ：</h5><p><strong>仅配置了堆大小为2G</strong></p>
+<p> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     <strong>YGCT    FGC    FGCT     GCT</strong><br>3584.0 3584.0 2462.4  0.0   691712.0 621990.9 1610240.0   661094.9  57216.0 56112.3 6784.0 6483.1   <strong>9996   70.672   2      0.102   70.774</strong></p>
+<h5 id="after："><a href="#after：" class="headerlink" title="after："></a>after：</h5><p><strong>第一版修改 设置总堆大小为4G，young generation ： old generation = 2：1</strong></p>
+<p> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   <strong>YGC     YGCT    FGC    FGCT     GCT</strong><br>4608.0 5120.0  0.0   3359.5 2062336.0 2011317.2 2072576.0   386632.2  59096.0 58032.5 6912.0 6629.8   <strong>3225   29.559   2      0.110   29.668</strong></p>
 
-        <div class="article-info info-on-right">
-          
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -325,7 +248,7 @@
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -338,17 +261,108 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/09/06/GC优化策略/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2019/09/06/自定义MP代码生成器/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          自定义MP代码生成器
+        
+      </div>
+    </a>
   
   
-    </div></section>
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -371,8 +385,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
