@@ -8,23 +8,23 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Hive join操作导致的数据倾斜全解 (附带源码) | Jax&#39;s blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?  skew join 的内容讲解join的数据倾斜common join原理)众所周知 ,hive是将sql翻译成MR 的操作在hadoop 上进行执行;所以,表数据通">
+  <meta name="description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?">
 <meta name="keywords" content="HIVE">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hive join操作导致的数据倾斜全解 (附带源码)">
 <meta property="og:url" content="http://yoursite.com/2019/11/17/如何开始阅读源码的第一步-debug源码/index.html">
 <meta property="og:site_name" content="Jax&#39;s blogs">
-<meta property="og:description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?  skew join 的内容讲解join的数据倾斜common join原理)众所周知 ,hive是将sql翻译成MR 的操作在hadoop 上进行执行;所以,表数据通">
+<meta property="og:description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://jaxma1996.github.io//article-image/common-join%E6%B5%81%E7%A8%8B%E5%9B%BE%E8%A7%A3.png">
-<meta property="og:image" content="en-resource://database/6321:1">
-<meta property="og:image" content="en-resource://database/6323:1">
-<meta property="og:image" content="en-resource://database/6325:1">
-<meta property="og:image" content="en-resource://database/6327:1">
-<meta property="og:updated_time" content="2019-11-17T12:59:38.290Z">
+<meta property="og:image" content="https://jaxma1996.github.io//article-image/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E4%BB%BB%E5%8A%A1%E8%BF%9B%E5%BA%A6.png">
+<meta property="og:image" content="https://jaxma1996.github.io//article-image/newSkewJoinResolver.png">
+<meta property="og:image" content="https://jaxma1996.github.io//article-image/GenMRSkewJoinProcessor.png">
+<meta property="og:image" content="https://jaxma1996.github.io//article-image/genMapJoinOperator.png">
+<meta property="og:updated_time" content="2019-11-17T13:09:28.157Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hive join操作导致的数据倾斜全解 (附带源码)">
-<meta name="twitter:description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?  skew join 的内容讲解join的数据倾斜common join原理)众所周知 ,hive是将sql翻译成MR 的操作在hadoop 上进行执行;所以,表数据通">
+<meta name="twitter:description" content="问题? join操作时 reduc一直卡着某个进度  数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true;  我明明设置了,但是不起效果?   还有什么参数设置是可以用于数据倾斜调优的?">
 <meta name="twitter:image" content="https://jaxma1996.github.io//article-image/common-join%E6%B5%81%E7%A8%8B%E5%9B%BE%E8%A7%A3.png">
   
     <link rel="alternative" href="/atom.xml" title="Jax&#39;s blogs" type="application/atom+xml">
@@ -197,16 +197,28 @@
 </li>
 <li>还有什么参数设置是可以用于数据倾斜调优的?</li>
 </ul>
-<h3 id="skew-join-的内容讲解"><a href="#skew-join-的内容讲解" class="headerlink" title="skew join 的内容讲解"></a>skew join 的内容讲解</h3><h4 id="join的数据倾斜"><a href="#join的数据倾斜" class="headerlink" title="join的数据倾斜"></a>join的数据倾斜</h4><h5 id="common-join原理"><a href="#common-join原理" class="headerlink" title="common join原理"></a>common join原理</h5><h5 id><a href="#" class="headerlink" title=")"></a><img src="https://jaxma1996.github.io//article-image/common-join%E6%B5%81%E7%A8%8B%E5%9B%BE%E8%A7%A3.png" alt="common-join流程图解.png">)</h5><p>众所周知 ,hive是将sql翻译成MR 的操作在hadoop 上进行执行;所以,表数据通过map读取,并且在shuffle的阶段进行分类打标签,<strong>将相同的key置于同一个reduce 处理</strong></p>
-<h5 id="为什么会发生数据倾斜"><a href="#为什么会发生数据倾斜" class="headerlink" title="为什么会发生数据倾斜?"></a>为什么会发生数据倾斜?</h5><p>由于相同的key会置于同一个reduce进行处理.<br>那么,当某个key 远远大于表中的其他key 时,对于这个key 的 join 操作时间就会远远的大于其他key的join操作时间, 就会呈现以下这种任务进度:<br>. <img src="en-resource://database/6321:1" alt="7b1fcab312ad6442ef1f19a38aa326fe.png"><br><strong>reduce 一直卡在某个进度</strong></p>
+<a id="more"></a>
+<p>————————————————</p>
+<h3 id="问题-1"><a href="#问题-1" class="headerlink" title="问题?"></a>问题?</h3><ul>
+<li>join操作时 reduc一直卡着某个进度 </li>
+<li>数据倾斜怎么办?  设置参数  SET hive.optimize.skewjoin=true; <ul>
+<li>我明明设置了,但是不起效果?</li>
+</ul>
+</li>
+<li>还有什么参数设置是可以用于数据倾斜调优的?</li>
+<li></li>
+</ul>
+<h3 id="skew-join-的内容讲解"><a href="#skew-join-的内容讲解" class="headerlink" title="skew join 的内容讲解"></a>skew join 的内容讲解</h3><h4 id="join的数据倾斜"><a href="#join的数据倾斜" class="headerlink" title="join的数据倾斜"></a>join的数据倾斜</h4><h5 id="common-join原理"><a href="#common-join原理" class="headerlink" title="common join原理"></a>common join原理</h5><p> <img src="https://jaxma1996.github.io//article-image/common-join%E6%B5%81%E7%A8%8B%E5%9B%BE%E8%A7%A3.png" alt="common-join流程图解.png"><br>众所周知 ,hive是将sql翻译成MR 的操作在hadoop 上进行执行;所以,表数据通过map读取,并且在shuffle的阶段进行分类打标签,<strong>将相同的key置于同一个reduce 处理</strong></p>
+<h5 id="为什么会发生数据倾斜"><a href="#为什么会发生数据倾斜" class="headerlink" title="为什么会发生数据倾斜?"></a>为什么会发生数据倾斜?</h5><p>由于相同的key会置于同一个reduce进行处理.<br>那么,当某个key 远远大于表中的其他key 时,对于这个key 的 join 操作时间就会远远的大于其他key的join操作时间, 就会呈现以下这种任务进度:<br>数据倾斜任务进度.png<br><img src="https://jaxma1996.github.io//article-image/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E4%BB%BB%E5%8A%A1%E8%BF%9B%E5%BA%A6.png" alt="数据倾斜任务进度.png"><br><strong>reduce 一直卡在某个进度</strong></p>
 <p>同时你也会在hadoop 任务管理平台上看到全部的reduce 都完成了,只有一两个reduce 还在执行,进度一直不变</p>
 <h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法?"></a>解决方法?</h5><p> 通过设置 参数:<strong>hive.optimize.skewjoin = true</strong> 默认为false ,</p>
-<p> 当设置了该参数的时候, hive 在将queray plan 编译为 task的时候会加入对应的解析器<strong>newSkewJoinResolver()</strong>  源码如下:<br> <img src="en-resource://database/6323:1" alt="845132e9ba6d3d112068c8d03943957d.png"><br> <strong>Q: 为什么要把大表放后面?</strong></p>
+<p> 当设置了该参数的时候, hive 在将queray plan 编译为 task的时候会加入对应的解析器<strong>newSkewJoinResolver()</strong>  源码如下:<br> <img src="https://jaxma1996.github.io//article-image/newSkewJoinResolver.png" alt="newSkewJoinResolver.png"><br> <strong>Q: 为什么要把大表放后面?</strong></p>
 <hr>
-<p>接下来会由GenMRSkewJoinProcessor<br><img src="en-resource://database/6325:1" alt="f29b3a30f47c82ab7f468977b756d3fd.png"></p>
+<p>接下来会由GenMRSkewJoinProcessor<br><img src="https://jaxma1996.github.io//article-image/GenMRSkewJoinProcessor.png" alt="GenMRSkewJoinProcessor.png"></p>
 <p><strong>Q : Outer join 的时候会有skew join 的优化嘛?</strong></p>
 <hr>
-<p>下图就是mapjoin operator 的生成<br> <img src="en-resource://database/6327:1" alt="f1d91aca506a86cd4e04e9b298b1bc3a.png"><br><strong>Q:还有什么参数可以提高skew join的速度嘛?</strong></p>
+<p>下图就是mapjoin operator 的生成</p>
+<p><img src="https://jaxma1996.github.io//article-image/genMapJoinOperator.png" alt="genMapJoinOperator.png"><br><strong>Q:还有什么参数可以提高skew join的速度嘛?</strong></p>
 <hr>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><h4 id="相关参数"><a href="#相关参数" class="headerlink" title="相关参数"></a>相关参数</h4><h5 id="hive-optimize-skewjoin"><a href="#hive-optimize-skewjoin" class="headerlink" title="hive.optimize.skewjoin"></a>hive.optimize.skewjoin</h5><p>原理: 通过对倾斜key使用mapjoin单独处理,使得数据倾斜问题的遏制</p>
 <h5 id="hive-skewjoin-key"><a href="#hive-skewjoin-key" class="headerlink" title="hive.skewjoin.key"></a>hive.skewjoin.key</h5><p>设置判断为倾斜key 的阈值 ,挡在joinoperator 中遇到一个key的数据量是大于该数字的 ,则判断为倾斜key</p>
@@ -436,14 +448,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">代码生成器</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">MybatisPlus</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
@@ -453,6 +457,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">代码生成器</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">MybatisPlus</a>
               </li>
              
               <li class="article-tag-list-item">
